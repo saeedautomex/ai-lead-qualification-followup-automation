@@ -1,0 +1,694 @@
+gm{
+  "name": "AI Lead Qualification & Automated Follow-Up System",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "new-lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -784,
+        -240
+      ],
+      "id": "072d9671-df9a-47d0-90ee-c06271b567e0",
+      "name": "Webhook",
+      "webhookId": "db2d28d0-34d9-4edb-992f-74e62213d54b"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "27b02f21-105f-4861-a526-2386b1840d85",
+              "name": "Expression",
+              "value": "={{ $json.query.name }}",
+              "type": "string"
+            },
+            {
+              "id": "9964c4d6-4715-4d83-9b5f-73dbc3c305ec",
+              "name": "email",
+              "value": "={{ $json.query.email }}",
+              "type": "string"
+            },
+            {
+              "id": "d64c93f6-9e38-44df-807d-b44eec706f42",
+              "name": "phone",
+              "value": "={{ $json.query.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "f10e4dc0-1172-48ee-9f4c-924918678669",
+              "name": "message",
+              "value": "={{ $json.query.message }}",
+              "type": "string"
+            },
+            {
+              "id": "0bbaf13e-267b-4251-86c1-fbfbc3ee610c",
+              "name": "received_at",
+              "value": "={{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        -240
+      ],
+      "id": "3e264112-d59a-45a2-8bd5-754413c85283",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a lead qualification assistant.\n\nAnalyze the following lead:\n\nName: {{ $json.name }}\nEmail: {{ $json.email }}\nPhone: {{ $json.phone }}\nMessage: {{ $json.message }}\n\nExtract the following information:\n\n1. Customer's main interest\n2. Budget\n3. Urgency\n4. Lead temperature: Hot, Warm, or Cold\n5. Lead score from 0 to 100\n6. A short reason for the score\n\nReturn the result in JSON format only.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -384,
+        -240
+      ],
+      "id": "776974e8-3362-4c4d-b035-634c188658d7",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "1453745c-288d-4187-a898-0bea95f85b70",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "MaE3ZfXfsCV55MDT",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput = $json.text;\n\nconst analysis = JSON.parse(aiOutput);\n\nconst lead = $('Edit Fields').first().json;\n\nreturn {\n  json: {\n    ...lead,\n    ...analysis\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -240
+      ],
+      "id": "4586575a-4706-4e08-b63e-23e5de1311fe",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ciuoAeH1FsW5wZfV4u8oRoP3_G-TjEs9Q0bdTvKegOI",
+          "mode": "list",
+          "cachedResultName": "AI Lead CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ciuoAeH1FsW5wZfV4u8oRoP3_G-TjEs9Q0bdTvKegOI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ciuoAeH1FsW5wZfV4u8oRoP3_G-TjEs9Q0bdTvKegOI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "received_at",
+              "displayName": "received_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "main_interest",
+              "displayName": "main_interest",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget",
+              "displayName": "budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "urgency",
+              "displayName": "urgency",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_temperature",
+              "displayName": "lead_temperature",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_score",
+              "displayName": "lead_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        -240
+      ],
+      "id": "a6f7dc32-46fd-4ebc-b178-161499186e59",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NrNFfmcdoZq7EHbM",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.lead_temperature }}",
+                    "rightValue": "Hot",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ce36b7c3-e14d-492a-9a21-fcad6d3c9984"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hot"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2025b2f4-5452-44b4-b2a9-4373ca80d831",
+                    "leftValue": "={{ $json.lead_temperature }}",
+                    "rightValue": "Warm",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Warm"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "959f204c-533e-4fc5-af5a-d447347d5c91",
+                    "leftValue": "={{ $json.lead_temperature }}",
+                    "rightValue": "Cold",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cold"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        -256
+      ],
+      "id": "f0e6c0ac-0113-4c40-8f4c-c996cb636a5e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional sales assistant.\n\nWrite a short, friendly follow-up message for this lead.\n\nLead name: {{ $('Edit Fields').first().json.name }}\nInterest: {{ $json.main_interest }}\nBudget: {{ $json.budget }}\nUrgency: {{ $json.urgency }}\n\nRules:\n- Be helpful and natural.\n- Do not be pushy.\n- Ask one useful question to qualify the lead.\n- Keep the message under 100 words.\n- Return only the message.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        816,
+        -240
+      ],
+      "id": "2d1373ba-3dac-49e1-92a5-03a42970bf73",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        736,
+        -64
+      ],
+      "id": "d4a8c4a7-0280-4b4f-8371-288dd447b8aa",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "MaE3ZfXfsCV55MDT",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').first().json.email }}",
+        "subject": "Thanks for your interest",
+        "emailType": "text",
+        "message": "=Hi {{ $('Edit Fields').first().json.name }},  {{ $json.text }}  Best regards, Sales Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1168,
+        -240
+      ],
+      "id": "98733266-44b9-4f57-8fb1-e5f18315977a",
+      "name": "Send a message",
+      "webhookId": "3509434d-4764-4923-8246-0f3885fc22b5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "A767XNj2Qw8Ry8TC",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sales@example.com",
+        "subject": "🔥 HOT LEAD - Immediate Follow-up Required",
+        "emailType": "text",
+        "message": "=A new HOT lead has arrived.  Name: {{ $json.name }} Email: {{ $json.email }} Phone: {{ $json.phone }}  Interest: {{ $json.main_interest }} Budget: {{ $json.budget }} Urgency: {{ $json.urgency }}  Lead Score: {{ $json.lead_score }}/100  Reason: {{ $json.reason }}  Please contact this lead as soon as possible.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        848,
+        -512
+      ],
+      "id": "73b013ee-e375-4837-a637-806590e250de",
+      "name": "Send a message1",
+      "webhookId": "7ae5fd5c-8259-4da4-a26e-9b05b2b70ff9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "A767XNj2Qw8Ry8TC",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        144
+      ],
+      "id": "e9e686eb-f57d-4157-8dc2-159ca61a8e51",
+      "name": "Wait",
+      "webhookId": "98b11a3f-9857-4a72-a384-c2ba63b682d0"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a helpful sales assistant.\n\nWrite a gentle follow-up message for this lead.\n\nName: {{ $json.name }}\nInterest: {{ $json.main_interest }}\nBudget: {{ $json.budget }}\n\nThe lead was previously classified as Cold.\n\nRules:\n- Do not be pushy.\n- Keep the message under 80 words.\n- Ask if they are still interested.\n- Return only the message.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1040,
+        144
+      ],
+      "id": "088eb4eb-d66a-4dd8-bfe4-80079184955a",
+      "name": "Basic LLM Chain2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1168,
+        304
+      ],
+      "id": "04d7a524-84a0-454c-af47-75ff668783b6",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "MaE3ZfXfsCV55MDT",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').first().json.email }}",
+        "subject": "Just checking in",
+        "emailType": "text",
+        "message": "=Hi {{ $('Edit Fields').first().json.name }},  {{ $json.text }}  Best regards, Sales Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        144
+      ],
+      "id": "d787c8ae-a945-49a5-975b-8c5f93101e17",
+      "name": "Send a message2",
+      "webhookId": "43e530db-5646-4080-89bf-b825cd4a658f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "A767XNj2Qw8Ry8TC",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "8b150f95-0618-4294-9824-8c396919e21d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd9b6c4303264d5b4ab1d9ac4154dca648aed7ae434936fe8615d0f7b1844f38"
+  },
+  "nodeGroups": [],
+  "id": "WgHd3ElKfcHWbJa5",
+  "tags": []
+}
